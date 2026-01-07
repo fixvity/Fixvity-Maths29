@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pythagorean Theorem Calculator</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+:root{
+  --primary:#2563eb;
+  --bg:#f4f7fb;
+  --card:#ffffff;
+  --radius:14px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Inter,system-ui,Arial;
+  background:var(--bg);
+}
+.container{
+  max-width:1150px;
+  margin:auto;
+  padding:24px;
+}
+.card{
+  background:var(--card);
+  border-radius:var(--radius);
+  padding:30px;
+  box-shadow:0 12px 32px rgba(0,0,0,.08);
+}
+h1{margin:0;color:var(--primary)}
+small{color:#555}
+
+label{
+  display:block;
+  margin-top:16px;
+  font-weight:600;
+}
+input{
+  width:100%;
+  padding:14px;
+  margin-top:6px;
+  border-radius:10px;
+  border:1px solid #ddd;
+  font-size:16px;
+}
+button{
+  width:100%;
+  margin-top:26px;
+  padding:16px;
+  font-size:17px;
+  background:var(--primary);
+  color:#fff;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+}
+button:hover{opacity:.93}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+  gap:26px;
+  margin-top:32px;
+}
+.result{
+  font-size:18px;
+  font-weight:700;
+}
+.formula{
+  font-size:15px;
+  color:#444;
+}
+.error{
+  color:#dc2626;
+  font-weight:600;
+  margin-top:12px;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<div class="card">
+<h1>Pythagorean Theorem Calculator</h1>
+<small>Accurate right-triangle calculations · International standards</small>
+
+<label>Side a (Leg)</label>
+<input type="number" id="a" placeholder="Enter side a" min="0" step="any">
+
+<label>Side b (Leg)</label>
+<input type="number" id="b" placeholder="Enter side b" min="0" step="any">
+
+<label>Hypotenuse c</label>
+<input type="number" id="c" placeholder="Enter hypotenuse c" min="0" step="any">
+
+<button onclick="calculate()">Calculate</button>
+<div id="error" class="error"></div>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <div class="result" id="output">Result = —</div>
+  </div>
+  <div class="card">
+    <div class="formula" id="formulaBox">
+      <b>Formula Used</b><br><br>—
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+const aEl = document.getElementById("a");
+const bEl = document.getElementById("b");
+const cEl = document.getElementById("c");
+const errorEl = document.getElementById("error");
+const outputEl = document.getElementById("output");
+const formulaEl = document.getElementById("formulaBox");
+
+function val(x){
+  const n = parseFloat(x);
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+
+function calculate(){
+  const A0 = val(aEl.value);
+  const B0 = val(bEl.value);
+  const C0 = val(cEl.value);
+
+  let A=A0, B=B0, C=C0;
+  let formulas=[];
+
+  errorEl.textContent="";
+  outputEl.innerHTML="Result = —";
+  formulaEl.innerHTML="<b>Formula Used</b><br><br>—";
+
+  const filled = [A,B,C].filter(v=>v!==null).length;
+  if(filled !== 2){
+    errorEl.textContent="Enter exactly TWO positive values.";
+    return;
+  }
+
+  try{
+    if(A!==null && B!==null){
+      C = Math.sqrt(A*A + B*B);
+      formulas.push("c = √(a² + b²)");
+    }
+    else if(A!==null && C!==null){
+      if(C <= A) throw "c must be greater than a";
+      B = Math.sqrt(C*C - A*A);
+      formulas.push("b = √(c² − a²)");
+    }
+    else if(B!==null && C!==null){
+      if(C <= B) throw "c must be greater than b";
+      A = Math.sqrt(C*C - B*B);
+      formulas.push("a = √(c² − b²)");
+    }
+
+    const area = 0.5 * A * B;
+    const perimeter = A + B + C;
+
+    outputEl.innerHTML = `
+      a = ${A.toFixed(6)}<br>
+      b = ${B.toFixed(6)}<br>
+      c = ${C.toFixed(6)}<br><br>
+      Area = ${area.toFixed(6)}<br>
+      Perimeter = ${perimeter.toFixed(6)}
+    `;
+
+    formulaEl.innerHTML =
+      "<b>Formula Used</b><br><br>" + formulas.join("<br>");
+
+  }catch{
+    errorEl.textContent="Invalid right-triangle values.";
+  }
+}
+</script>
+
+</body>
+  </html>
