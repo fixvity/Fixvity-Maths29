@@ -65,8 +65,9 @@ button:hover{opacity:.93}
   margin-top:32px;
 }
 .result{
-  font-size:18px;
+  font-size:17px;
   font-weight:700;
+  line-height:1.6;
 }
 .formula{
   font-size:15px;
@@ -88,13 +89,13 @@ button:hover{opacity:.93}
 <small>Accurate right-triangle calculations · International standards</small>
 
 <label>Side a (Leg)</label>
-<input type="number" id="a" placeholder="Enter side a" min="0" step="any">
+<input type="number" id="a" placeholder="Enter side a">
 
 <label>Side b (Leg)</label>
-<input type="number" id="b" placeholder="Enter side b" min="0" step="any">
+<input type="number" id="b" placeholder="Enter side b">
 
 <label>Hypotenuse c</label>
-<input type="number" id="c" placeholder="Enter hypotenuse c" min="0" step="any">
+<input type="number" id="c" placeholder="Enter hypotenuse c">
 
 <button onclick="calculate()">Calculate</button>
 <div id="error" class="error"></div>
@@ -106,7 +107,7 @@ button:hover{opacity:.93}
   </div>
   <div class="card">
     <div class="formula" id="formulaBox">
-      <b>Formula Used</b><br><br>—
+      <b>Formulas Used</b><br><br>—
     </div>
   </div>
 </div>
@@ -114,71 +115,71 @@ button:hover{opacity:.93}
 </div>
 
 <script>
-const aEl = document.getElementById("a");
-const bEl = document.getElementById("b");
-const cEl = document.getElementById("c");
-const errorEl = document.getElementById("error");
-const outputEl = document.getElementById("output");
-const formulaEl = document.getElementById("formulaBox");
-
-function val(x){
-  const n = parseFloat(x);
-  return Number.isFinite(n) && n > 0 ? n : null;
-}
-
 function calculate(){
-  const A0 = val(aEl.value);
-  const B0 = val(bEl.value);
-  const C0 = val(cEl.value);
+  const A0=parseFloat(a.value);
+  const B0=parseFloat(b.value);
+  const C0=parseFloat(c.value);
 
-  let A=A0, B=B0, C=C0;
+  let A=A0,B=B0,C=C0;
   let formulas=[];
 
-  errorEl.textContent="";
-  outputEl.innerHTML="Result = —";
-  formulaEl.innerHTML="<b>Formula Used</b><br><br>—";
+  error.innerText="";
+  output.innerHTML="Result = —";
+  formulaBox.innerHTML="<b>Formulas Used</b><br><br>—";
 
-  const filled = [A,B,C].filter(v=>v!==null).length;
-  if(filled !== 2){
-    errorEl.textContent="Enter exactly TWO positive values.";
+  const filled=[A,B,C].filter(v=>!isNaN(v) && v>0).length;
+  if(filled!==2){
+    error.innerText="Enter exactly TWO positive values.";
     return;
   }
 
   try{
-    if(A!==null && B!==null){
-      C = Math.sqrt(A*A + B*B);
+    if(!isNaN(A)&&!isNaN(B)){
+      C=Math.sqrt(A*A+B*B);
       formulas.push("c = √(a² + b²)");
     }
-    else if(A!==null && C!==null){
-      if(C <= A) throw "c must be greater than a";
-      B = Math.sqrt(C*C - A*A);
+    else if(!isNaN(A)&&!isNaN(C)){
+      if(C<=A) throw "";
+      B=Math.sqrt(C*C-A*A);
       formulas.push("b = √(c² − a²)");
     }
-    else if(B!==null && C!==null){
-      if(C <= B) throw "c must be greater than b";
-      A = Math.sqrt(C*C - B*B);
+    else if(!isNaN(B)&&!isNaN(C)){
+      if(C<=B) throw "";
+      A=Math.sqrt(C*C-B*B);
       formulas.push("a = √(c² − b²)");
     }
 
-    const area = 0.5 * A * B;
-    const perimeter = A + B + C;
+    const alpha = Math.atan2(A,B)*180/Math.PI;
+    const beta  = 90 - alpha;
+    const area = 0.5*A*B;
+    const perimeter = A+B+C;
+    const h = (A*B)/C;
 
-    outputEl.innerHTML = `
+    output.innerHTML=`
       a = ${A.toFixed(6)}<br>
       b = ${B.toFixed(6)}<br>
       c = ${C.toFixed(6)}<br><br>
+
+      α = ${alpha.toFixed(6)}°<br>
+      β = ${beta.toFixed(6)}°<br><br>
+
       Area = ${area.toFixed(6)}<br>
-      Perimeter = ${perimeter.toFixed(6)}
+      Perimeter = ${perimeter.toFixed(6)}<br>
+      Altitude (h) = ${h.toFixed(6)}
     `;
 
-    formulaEl.innerHTML =
-      "<b>Formula Used</b><br><br>" + formulas.join("<br>");
+    formulaBox.innerHTML=
+      "<b>Formulas Used</b><br><br>"+
+      formulas.join("<br>")+"<br>"+
+      "α = tan⁻¹(a/b)<br>"+
+      "Area = ½ab<br>"+
+      "h = ab / c";
 
   }catch{
-    errorEl.textContent="Invalid right-triangle values.";
+    error.innerText="Invalid right-triangle values.";
   }
 }
 </script>
 
 </body>
-  </html>
+</html>
